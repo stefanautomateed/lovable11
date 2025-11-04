@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useMemo } from 'react';
 import { useStore } from '../../store/useStore';
 import { RefreshCw, Smartphone, Monitor, Tablet } from 'lucide-react';
 import { useState } from 'react';
@@ -7,36 +7,29 @@ type ViewportSize = 'mobile' | 'tablet' | 'desktop';
 
 export default function PreviewPanel() {
   const { files } = useStore();
-  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [viewportSize, setViewportSize] = useState<ViewportSize>('desktop');
   const [refreshKey, setRefreshKey] = useState(0);
 
-  useEffect(() => {
-    if (iframeRef.current) {
-      const iframe = iframeRef.current;
-      const document = iframe.contentDocument || iframe.contentWindow?.document;
+  // Generate the HTML content for the iframe using srcdoc
+  const previewContent = useMemo(() => {
+    // Extract just the body content from HTML
+    const bodyContent = files.html
+      .replace(/<head>[\s\S]*?<\/head>/i, '')
+      .replace(/<\/?html[^>]*>/gi, '')
+      .replace(/<\/?body[^>]*>/gi, '');
 
-      if (document) {
-        const content = `
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>${files.css}</style>
-          </head>
-          <body>
-            ${files.html.replace(/<head>[\s\S]*?<\/head>/i, '').replace(/<\/?html[^>]*>/gi, '').replace(/<\/?body[^>]*>/gi, '')}
-            <script>${files.javascript}<\/script>
-          </body>
-          </html>
-        `;
-
-        document.open();
-        document.write(content);
-        document.close();
-      }
-    }
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>${files.css}</style>
+</head>
+<body>
+  ${bodyContent}
+  <script>${files.javascript}<\/script>
+</body>
+</html>`;
   }, [files, refreshKey]);
 
   const handleRefresh = () => {
@@ -121,9 +114,9 @@ export default function PreviewPanel() {
           }}
         >
           <iframe
-            ref={iframeRef}
             key={refreshKey}
             title="preview"
+            srcDoc={previewContent}
             className="w-full h-full border-0"
             sandbox="allow-scripts allow-modals allow-forms allow-popups"
           />
