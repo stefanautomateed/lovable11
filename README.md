@@ -91,6 +91,24 @@
 
 ### Configuration
 
+You can configure your OpenAI API key in two ways:
+
+#### Option 1: Environment Variable (Recommended for deployment)
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Edit .env and add your API key
+VITE_OPENAI_API_KEY=sk-your-api-key-here
+```
+
+For Vercel deployment:
+1. Go to your project settings in Vercel
+2. Navigate to Environment Variables
+3. Add `VITE_OPENAI_API_KEY` with your OpenAI API key
+4. Redeploy your application
+
+#### Option 2: Browser Settings (For local use)
 1. Click the **Settings** icon in the top-right corner
 2. Enter your OpenAI API key
 3. Click **Save Settings**

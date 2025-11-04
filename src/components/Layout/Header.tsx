@@ -120,13 +120,21 @@ export default function Header() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   OpenAI API Key
                 </label>
-                <input
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="sk-..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
-                />
+                {import.meta.env.VITE_OPENAI_API_KEY ? (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-2">
+                    <p className="text-sm text-green-800">
+                      ✓ API key configured via environment variable
+                    </p>
+                  </div>
+                ) : (
+                  <input
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="sk-..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+                  />
+                )}
                 <p className="text-xs text-gray-500 mt-2">
                   Get your API key from{' '}
                   <a
@@ -138,13 +146,20 @@ export default function Header() {
                     OpenAI Platform
                   </a>
                 </p>
+                {!import.meta.env.VITE_OPENAI_API_KEY && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    💡 For Vercel deployment: Set <code className="bg-gray-100 px-1 rounded">VITE_OPENAI_API_KEY</code> in environment variables
+                  </p>
+                )}
               </div>
-              <button
-                onClick={handleSaveApiKey}
-                className="w-full btn-primary"
-              >
-                Save Settings
-              </button>
+              {!import.meta.env.VITE_OPENAI_API_KEY && (
+                <button
+                  onClick={handleSaveApiKey}
+                  className="w-full btn-primary"
+                >
+                  Save Settings
+                </button>
+              )}
             </div>
           </div>
         </div>

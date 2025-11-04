@@ -64,15 +64,36 @@ function parseCodeBlocks(content: string): Partial<FileContent> {
   return files;
 }
 
+function getApiKey(): string | null {
+  // First, try to get from environment variable (Vercel, etc.)
+  // Environment variables in Vite must be prefixed with VITE_
+  const envKey = import.meta.env.VITE_OPENAI_API_KEY;
+  if (envKey) {
+    console.log('Using API key from environment variable');
+    return envKey;
+  }
+
+  // Fall back to localStorage (user settings)
+  const localKey = localStorage.getItem('openai_api_key');
+  if (localKey) {
+    console.log('Using API key from local storage');
+    return localKey;
+  }
+
+  return null;
+}
+
 export async function generateCode(
   userPrompt: string,
   currentFiles: FileContent
 ): Promise<GenerateCodeResponse> {
-  const apiKey = localStorage.getItem('openai_api_key');
+  const apiKey = getApiKey();
 
   if (!apiKey) {
     throw new Error(
-      'OpenAI API key not found. Please set it in Settings (top right corner).'
+      'OpenAI API key not found. Please either:\n\n' +
+      '1. Set it in Settings (top right corner), OR\n' +
+      '2. Add VITE_OPENAI_API_KEY to your environment variables in Vercel'
     );
   }
 
